@@ -5,7 +5,7 @@ public class Client {
     public static void main(String[] args) {
         
         try {
-            Socket socket = new Socket("localhost", 5000);
+            Socket socket = new Socket("localhost", 9002);
 
             BufferedReader input = new BufferedReader( new InputStreamReader(socket.getInputStream()));
 

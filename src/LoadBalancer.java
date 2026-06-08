@@ -4,13 +4,18 @@ import java.util.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.management.RuntimeErrorException;
+
 import java.util.concurrent.Executor;
 
 public class LoadBalancer {
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(20);
     
-    private static final List<Integer> backendPorts = Arrays.asList(9001, 9002, 9003);
+    private static final List<Integer> allServers = Arrays.asList(9001, 9002, 9003);
+
+    private static final List<Integer> activeservers = new ArrayList<>(allServers);
 
     private static int currentIndex = 0;
 
@@ -24,7 +29,10 @@ public class LoadBalancer {
 
             while (true) {
                 Socket clientSocket = loadBalancerSocket.accept();
-
+                
+                if(activeservers.isEmpty()) {
+                    throw new RuntimeException("No active backend servers available");
+                }
                 int backendPort = getNextBackendPort();
 
                 System.out.println("Forwarding request to backend server on port " + backendPort);
@@ -39,9 +47,9 @@ public class LoadBalancer {
     }
 
     private static synchronized int getNextBackendPort() {
-        int port = backendPorts.get(currentIndex);
+        int port = allServers.get(currentIndex);
 
-        currentIndex = (currentIndex + 1) % backendPorts.size();
+        currentIndex = (currentIndex + 1) % activeservers.size();
 
         return port; 
     }

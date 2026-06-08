@@ -5,10 +5,6 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.management.RuntimeErrorException;
-
-import java.util.concurrent.Executor;
-
 public class LoadBalancer {
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(20);
@@ -26,6 +22,12 @@ public class LoadBalancer {
             ServerSocket loadBalancerSocket = new ServerSocket(8000);
 
             System.out.println("Load Balancer  running on port 8000..");
+
+            Thread healthCheckerThread = new Thread(
+                new HealthChecker(allServers, activeservers)
+            );
+
+            healthCheckerThread.start();
 
             while (true) {
                 Socket clientSocket = loadBalancerSocket.accept();
@@ -47,40 +49,10 @@ public class LoadBalancer {
     }
 
     private static synchronized int getNextBackendPort() {
-        int port = allServers.get(currentIndex);
+        int port = activeservers.get(currentIndex);
 
         currentIndex = (currentIndex + 1) % activeservers.size();
 
         return port; 
-    }
-
-    private static void handleClientRequest(Socket clientSocket, int backendPort) {
-
-        try {
-
-            BufferedReader clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
-            PrintWriter clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-
-            String clientMessage = clientInput.readLine();
-
-            Socket backendSocket = new Socket("localhost", backendPort);
-
-            BufferedReader backendInput = new BufferedReader(new InputStreamReader(backendSocket.getInputStream()));
-
-            PrintWriter backendOutput = new PrintWriter(backendSocket.getOutputStream(), true);
-
-            backendOutput.println(clientMessage);
-
-            String backendResponse = backendInput.readLine();
-
-            clientOutput.println(backendResponse);
-
-            backendSocket.close();
-            clientSocket.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

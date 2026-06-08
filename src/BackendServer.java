@@ -28,6 +28,11 @@ public class BackendServer {
 
                 String request = input.readLine();
 
+                if(request == null) {
+                    clientSocket.close();
+                    continue;
+                }
+
                 System.out.println(serverName + " received: " + request);
 
                 output.println("Response from " + serverName);

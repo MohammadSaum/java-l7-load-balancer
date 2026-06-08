@@ -2,7 +2,13 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
+
 public class LoadBalancer {
+
+    private static final ExecutorService executor = Executors.newFixedThreadPool(20);
     
     private static final List<Integer> backendPorts = Arrays.asList(9001, 9002, 9003);
 
@@ -23,7 +29,7 @@ public class LoadBalancer {
 
                 System.out.println("Forwarding request to backend server on port " + backendPort);
 
-                handleClientRequest(clientSocket, backendPort);
+                executor.submit(new LoadBalancerClientHandler(clientSocket, backendPort));
 
             }
 

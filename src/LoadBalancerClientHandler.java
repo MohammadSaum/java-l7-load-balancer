@@ -16,9 +16,7 @@ public class LoadBalancerClientHandler implements Runnable {
         try{
             BufferedReader clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            PrintWriter clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-
-            String clientMessage = clientInput.readLine();
+            PrintWriter clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);         
 
             Socket backendSocket = new Socket("localhost", backendPort);
 
@@ -26,11 +24,30 @@ public class LoadBalancerClientHandler implements Runnable {
 
             PrintWriter backendOutput = new PrintWriter(backendSocket.getOutputStream(), true);
 
-            backendOutput.println(clientMessage);
+            String line;
 
-            String backendResponse = backendInput.readLine();
+            while((line = clientInput.readLine()) != null) {
+                backendOutput.println(line);
+                if(line.isEmpty()) {
+                    break; 
+                }
+            }
 
-            clientOutput.println(backendResponse);
+            String responseLine;
+
+            while ((responseLine = backendInput.readLine()) != null) {
+                clientOutput.println(responseLine);
+
+                if(responseLine.isEmpty()) {
+                    break;
+                }
+            }
+
+            String body = backendInput.readLine();
+
+            if(body != null){
+                clientOutput.println(body);
+            }
 
             backendSocket.close();
             clientSocket.close();

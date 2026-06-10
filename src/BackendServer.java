@@ -26,16 +26,23 @@ public class BackendServer {
 
                 PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
 
-                String request = input.readLine();
+                String line = input.readLine();
 
-                if(request == null) {
-                    clientSocket.close();
-                    continue;
+                while((line = input.readLine()) != null) {
+                    if(line.isEmpty()) {
+                        break;
+                    }
+                    System.out.println(serverName + " -> " + line);
                 }
 
-                System.out.println(serverName + " received: " + request);
+                String responseBody = "Response from " + serverName;
 
-                output.println("Response from " + serverName);
+                output.println("HTTP/1.1 200 OK");
+                output.println("Content-Type: text/plain");
+                output.println("Content-length: " + responseBody.length());
+
+                output.println();
+                output.println(responseBody);
 
                 clientSocket.close();
 

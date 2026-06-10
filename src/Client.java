@@ -11,12 +11,16 @@ public class Client {
 
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 
-            output.println("Hello server");
+            output.println("GET / HTTP/1.1");
+            output.println("Host: localhost");
+            output.println();
 
-            String response = input.readLine();
+            String line;
 
-            System.out.println("Server replied: " + response);
-
+            while((line = input.readLine()) != null){
+                System.out.println(line);
+            }
+            
             socket.close();
 
         } catch(IOException e){

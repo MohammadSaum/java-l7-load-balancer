@@ -21,7 +21,7 @@ public class LoadBalancer {
 
             ServerSocket loadBalancerSocket = new ServerSocket(8000);
 
-            System.out.println("Load Balancer  running on port 8000..");
+            System.out.println("Load Balancer running on port 8000..");
 
             Thread healthCheckerThread = new Thread(
                 new HealthChecker(allServers, activeservers)
@@ -38,6 +38,8 @@ public class LoadBalancer {
                 int backendPort = getNextBackendPort();
 
                 System.out.println("Forwarding request to backend server on port " + backendPort);
+
+                Metrics.printMetrics();
 
                 executor.submit(new LoadBalancerClientHandler(clientSocket, backendPort));
 

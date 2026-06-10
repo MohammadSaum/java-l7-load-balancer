@@ -20,6 +20,8 @@ public class LoadBalancerClientHandler implements Runnable {
 
             Socket backendSocket = new Socket("localhost", backendPort);
 
+            Metrics.incrementRequestCount(backendPort);
+
             BufferedReader backendInput = new BufferedReader(new InputStreamReader(backendSocket.getInputStream()));
 
             PrintWriter backendOutput = new PrintWriter(backendSocket.getOutputStream(), true);

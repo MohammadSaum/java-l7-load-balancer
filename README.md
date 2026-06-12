@@ -19,25 +19,33 @@ A high-performance, multi-threaded Layer 7 (Application Layer) load balancer and
 ## 🏗️ Architectural Overview
 
 ```text
-    [ Client Requests ]
-            │
-            ▼
-┌───────────────────────────┐
-│  Layer 7 Load Balancer    │ (Port: 8080)
-│  ├─ Thread Pool Handler   │
-│  ├─ HTTP Request Parser   │
-│  └─ Active Health Checker │ ──(Periodic Heartbeats)──┐
-└─────────────┬─────────────┘                         │
-              │                                       ▼
-      [ Round-Robin Loop ]                 ┌─────────────────────┐
-              │                            │ Crashed Server (502)│
-     ┌────────┼────────┐                   │  [Temporarily Out]  │
-     │        │        │                   └─────────────────────┘
-     ▼        ▼        ▼
-┌────────┐┌────────┐┌────────┐
-│ServerA ││ServerB ││ServerC │
-│ (5001) ││ (5002) ││ (5003) │
-└────────┘└────────┘└────────┘
+                    +----------------------+
+                    |       Client         |
+                    +----------+-----------+
+                               |
+                               v
+                    +----------------------+
+                    |    Load Balancer     |
+                    |      Port 8000       |
+                    +----------+-----------+
+                               |
+          +-------------------+-------------------+
+          |                   |                   |
+          v                   v                   v
+ +----------------+ +----------------+ +----------------+
+ | Backend Server | | Backend Server | | Backend Server |
+ |    Port 9001   | |    Port 9002   | |    Port 9003   |
+ +----------------+ +----------------+ +----------------+
+
+            +--------------------------+
+            |      Health Checker      |
+            |  Active Server Monitoring|
+            +--------------------------+
+
+            +--------------------------+
+            |         Metrics          |
+            | Request Count Per Server |
+            +--------------------------+
 ```
 ---
 ## 🛠️ Tech Stack & Core Concepts
@@ -51,27 +59,105 @@ A high-performance, multi-threaded Layer 7 (Application Layer) load balancer and
 
 ---
 
-## 🎯 Current Project Status: In Progress
-**Development Roadmap**
+## 🎯 Project Status
 
-[x] Repository setup & Architecture Design
+### Completed Features
 
-[ ] Implement single-threaded TCP Socket Reverse Proxy
+- [x] Round Robin Load Balancing
+- [x] Reverse Proxy Request Forwarding
+- [x] Multi-threaded Request Handling using ExecutorService
+- [x] Active Backend Health Checks
+- [x] Automatic Failover and Recovery
+- [x] HTTP Request Forwarding
+- [x] Request Metrics Collection
 
-[ ] Integrate Java Concurrency Tools for Multi-threaded Request Handling
+### Future Improvements
 
-[ ] Build Layer 7 HTTP parsing & Round-Robin routing logic
-
-[ ] Add active background Health Check daemon
-
-[ ] Performance testing and benchmarking (using Apache Bench / Postman)
-
+- [ ] Weighted Round Robin Routing
+- [ ] Configuration File Support
+- [ ] Docker Deployment
+- [ ] Monitoring Dashboard
 ---
 
-## To compile the project ##
+## ▶️ How To Run
 
-javac Main.java
+### 1. Clone the Repository
 
-## To run the load balancer gateway ##
+```bash
+git clone https://github.com/MohammadSaum/java-l7-load-balancer.git
+cd java-l7-load-balancer
+```
 
-java Main
+### 2. Compile the Project
+
+```bash
+javac src/*.java
+```
+
+### 3. Start Backend Servers
+
+Open three separate terminals:
+
+**Terminal 1**
+```bash
+java -cp src BackendServer 9001 Server-1
+```
+
+**Terminal 2**
+```bash
+java -cp src BackendServer 9002 Server-2
+```
+
+**Terminal 3**
+```bash
+java -cp src BackendServer 9003 Server-3
+```
+
+### 4. Start the Load Balancer
+
+Open a fourth terminal:
+
+```bash
+java -cp src LoadBalancer
+```
+
+### 5. Run the Client
+
+Open a fifth terminal:
+
+```bash
+java -cp src Client
+```
+
+### 6. Verify Round Robin Routing
+
+Run the client multiple times. Requests should be distributed across:
+
+- Server-1 (Port 9001)
+- Server-2 (Port 9002)
+- Server-3 (Port 9003)
+
+### 7. Test Failover & Recovery
+
+1. Stop one backend server.
+2. Wait for the Health Checker to detect the failure.
+3. Observe the server being removed from the active pool.
+4. Restart the backend server.
+5. Observe the server being automatically restored to the active pool.
+
+### 8. Monitor Metrics
+
+The Metrics component periodically displays:
+
+- Requests handled by Server-1
+- Requests handled by Server-2
+- Requests handled by Server-3
+
+## 📊 Example Features Demonstrated
+
+- Load distribution using Round Robin scheduling
+- Concurrent request processing using ExecutorService
+- Backend health monitoring
+- Automatic failover and recovery
+- HTTP request forwarding
+- Per-server request metrics collection

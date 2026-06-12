@@ -8,7 +8,7 @@ A high-performance, multi-threaded Layer 7 (Application Layer) load balancer and
 
 ## 🚀 Key Features
 
-* **Layer 7 Path-Based Routing:** Parses incoming raw HTTP/1.1 request strings over TCP to route traffic dynamically based on URL paths.
+**HTTP Request Forwarding:** Forwards HTTP requests and responses between clients and backend servers while acting as a reverse proxy.
 * **Multi-Threaded Architecture:** Utilizes a thread pool (`ExecutorService`) to handle hundreds of concurrent client connections simultaneously without blocking.
 * **Round-Robin Load Balancing:** Implements a thread-safe atomic routing algorithm (`AtomicInteger`) to cycle traffic evenly across active backend nodes.
 * **Active Backend Health Checks:** Runs a background daemon thread that actively pings registered backend servers at regular intervals, dynamically removing crashed instances from the rotation pool.
@@ -53,7 +53,7 @@ A high-performance, multi-threaded Layer 7 (Application Layer) load balancer and
 
 **Networking:** Java Sockets (ServerSocket, Socket)
 
-**Concurrency:** ExecutorService, ThreadPoolExecutor, AtomicInteger, Thread Safety
+**Concurrency:** ExecutorService, ThreadPoolExecutor, Thread Safety
 
 **Protocols:** HTTP/1.1, TCP/IP
 

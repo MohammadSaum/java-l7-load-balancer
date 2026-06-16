@@ -10,7 +10,7 @@ A high-performance, multi-threaded Layer 7 (Application Layer) load balancer and
 
 **HTTP Request Forwarding:** Forwards HTTP requests and responses between clients and backend servers while acting as a reverse proxy.
 * **Multi-Threaded Architecture:** Utilizes a thread pool (`ExecutorService`) to handle hundreds of concurrent client connections simultaneously without blocking.
-* **Round-Robin Load Balancing:** Implements a thread-safe atomic routing algorithm (`AtomicInteger`) to cycle traffic evenly across active backend nodes.
+* **Round-Robin Load Balancing:** thread-safe round robin routing using synchronized access to the active server pool.
 * **Active Backend Health Checks:** Runs a background daemon thread that actively pings registered backend servers at regular intervals, dynamically removing crashed instances from the rotation pool.
 * **Reverse Proxy Shield:** Disguises backend server topography, safeguarding internal infrastructure from direct internet exposure.
 
